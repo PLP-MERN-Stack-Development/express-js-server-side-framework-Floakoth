@@ -12,6 +12,23 @@ const PORT = process.env.PORT || 3000;
 // Middleware setup
 app.use(bodyParser.json());
 
+// logging Middleware 
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
+// Authentication Middleware 
+app.use((req, res, next) => {
+ const token= req.headers['authorization'];
+ if(!token || token !== '1234') {
+  return res.status(401).json({ message: 'Unauthorized' });
+ }
+ next(); 
+});
+
+
+
 // Sample in-memory products database
 let products = [
   {
@@ -57,10 +74,60 @@ app.get('/api/products', (req, res) => {
   res.json(products);
 });
 
+// get product by id
+app.get('/api/products/:id', (req, res) => {
+  const product = products.find(p => p.id === req.params.id);
+  if (!product) return res.status(404).json({ message: 'Product not found' });
+  res.json(products);
+});
+// create new product
+app.post('/api/products', (req, res) => {
+  const{name, description, price, category, inStock} = req.body;
+  if (!name || price == null) {
+    return res.status(400).json({ message: 'All product fields are required' });
+  }
+  const newProduct = { 
+    id: uuidv4(), 
+   name,
+   description,
+    price,
+    category,
+    inStock
+  };
+  products.push(newProduct);
+  res.status(201).json(newProduct);
+});
+// update product
+app.put('/api/products/:id', (req, res) => {
+  const product = products.find(p => p.id === req.params.id);
+  if (!product) return res.status(404).json({ message: 'Product not found' });
+  const { name, description, price, category, inStock } = req.body;
+  if(name) product.name = name;
+  if(description) product.description = description;
+  if(price) product.price = price;
+  if(category) product.category = category;
+  if(inStock !==undefined) product.inStock = inStock;
+  res.json(product);
+});
+
+//delete product
+app.delete('/api/products/:id', (req, res) => {
+  const productIndex = products.findIndex(p => p.id === req.params.id);
+  if (productIndex === -1) return res.status(404).json({ message: 'Product not found' });
+  products.splice(productIndex, 1);
+  res.json({ message: 'Product deleted successfully' });
+});
+
 // TODO: Implement custom middleware for:
 // - Request logging
 // - Authentication
 // - Error handling
+
+//error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'internal server error!' });
+});
 
 // Start the server
 app.listen(PORT, () => {

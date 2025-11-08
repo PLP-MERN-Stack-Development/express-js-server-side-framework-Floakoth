@@ -36,15 +36,162 @@ You will:
 - npm or yarn
 - Postman, Insomnia, or curl for API testing
 
-## API Endpoints
+## API Documentation
 
-The API will have the following endpoints:
+### Authentication
 
-- `GET /api/products`: Get all products
-- `GET /api/products/:id`: Get a specific product
-- `POST /api/products`: Create a new product
-- `PUT /api/products/:id`: Update a product
-- `DELETE /api/products/:id`: Delete a product
+All API endpoints require authentication. Include an Authorization header with your token:
+
+```http
+Authorization: 1234
+```
+
+If the token is missing or invalid, you'll receive a 401 Unauthorized response.
+
+### API Endpoints
+
+#### Get All Products
+```http
+GET /api/products
+```
+
+**Response** (200 OK)
+```json
+[
+  {
+    "id": "1",
+    "name": "Laptop",
+    "description": "High-performance laptop with 16GB RAM",
+    "price": 1200,
+    "category": "electronics",
+    "inStock": true
+  },
+  {
+    "id": "2",
+    "name": "Smartphone",
+    "description": "Latest model with 128GB storage",
+    "price": 800,
+    "category": "electronics",
+    "inStock": true
+  }
+]
+```
+
+#### Get Single Product
+```http
+GET /api/products/:id
+```
+
+**Response** (200 OK)
+```json
+{
+  "id": "1",
+  "name": "Laptop",
+  "description": "High-performance laptop with 16GB RAM",
+  "price": 1200,
+  "category": "electronics",
+  "inStock": true
+}
+```
+
+#### Create Product
+```http
+POST /api/products
+```
+
+**Request Body**
+```json
+{
+  "name": "Headphones",
+  "description": "Wireless noise-canceling headphones",
+  "price": 199,
+  "category": "electronics",
+  "inStock": true
+}
+```
+
+**Response** (201 Created)
+```json
+{
+  "id": "4",
+  "name": "Headphones",
+  "description": "Wireless noise-canceling headphones",
+  "price": 199,
+  "category": "electronics",
+  "inStock": true
+}
+```
+
+#### Update Product
+```http
+PUT /api/products/:id
+```
+
+**Request Body**
+```json
+{
+  "price": 179,
+  "inStock": false
+}
+```
+
+**Response** (200 OK)
+```json
+{
+  "id": "4",
+  "name": "Headphones",
+  "description": "Wireless noise-canceling headphones",
+  "price": 179,
+  "category": "electronics",
+  "inStock": false
+}
+```
+
+#### Delete Product
+```http
+DELETE /api/products/:id
+```
+
+**Response** (200 OK)
+```json
+{
+  "message": "Product deleted successfully"
+}
+```
+
+### Error Responses
+
+#### 400 Bad Request
+Returned when required fields are missing in the request body.
+```json
+{
+  "message": "All product fields are required"
+}
+```
+
+#### 401 Unauthorized
+Returned when the authentication token is missing or invalid.
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+#### 404 Not Found
+Returned when the requested product doesn't exist.
+```json
+{
+  "message": "Product not found"
+}
+```
+
+#### 500 Internal Server Error
+Returned when an unexpected error occurs on the server.
+```json
+{
+  "message": "Internal server error!"
+}
+```
 
 ## Submission
 
